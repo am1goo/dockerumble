@@ -11,7 +11,7 @@ namespace dockerumble
 
         public static void Error(string text)
         {
-            Console.WriteLine($"[ERR] {text}");
+            Console2.WriteLine($"[ERR] {text}", ConsoleColor.Red);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -23,7 +24,10 @@ namespace dockerumble
 
         public static DockerBuildResult Build(string dockerImage, string dockerfileText)
         {
-            FileInfo fi = new FileInfo("Dockerfile");
+            const string dockerfile = "Dockerfile";
+            const string docker = "docker";
+            
+            FileInfo fi = new FileInfo(dockerfile);
             if (fi.Exists)
                 fi.Delete();
 
@@ -36,7 +40,7 @@ namespace dockerumble
             }
 
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.FileName = "docker";
+            startInfo.FileName = docker;
             startInfo.Arguments = $"build -t {dockerImage} --rm .";
             startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
@@ -64,7 +68,26 @@ namespace dockerumble
 
                 Console2.WriteLine(e.Data, ConsoleColor.Gray);
             };
-            proc.Start();
+
+            try
+            {
+                proc.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                switch (ex.NativeErrorCode)
+                {
+                    case 2:
+                        return new DockerBuildResult(-1, "", $"{docker} not found on this machine");
+                    default:
+                        return new DockerBuildResult(-1, "", $"{ex.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new DockerBuildResult(-1, "", $"{ex.Message}");
+            }
+
             proc.BeginOutputReadLine();
             proc.BeginErrorReadLine();
             proc.WaitForExit();// Waits here for the process to exit.

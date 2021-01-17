@@ -42,7 +42,7 @@ namespace dockerumble
                 else
                 {
                     Console.WriteLine($"Docker image {dockerImage} not created");
-                    Console2.WriteLine($"{result.consoleError}", ConsoleColor.Red);
+                    Errors.Error(result.consoleError);
                     Environment.Exit(result.exitCode);
                 }
             }
