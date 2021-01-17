@@ -43,28 +43,42 @@ namespace dockerumble
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
 
+            string outputData = string.Empty;
+            string errorData = string.Empty;
+
             Process proc = new Process();
             proc.StartInfo = startInfo;
+            proc.OutputDataReceived += (s, e) =>
+            {
+                if (outputData.Length > 0)
+                    outputData += Environment.NewLine;
+                outputData += e.Data;
+
+                Console2.WriteLine(e.Data, ConsoleColor.Gray);
+            };
+            proc.ErrorDataReceived += (s, e) =>
+            {
+                if (errorData.Length > 0)
+                    errorData += Environment.NewLine;
+                errorData += e.Data;
+
+                Console2.WriteLine(e.Data, ConsoleColor.Gray);
+            };
             proc.Start();
+            proc.BeginOutputReadLine();
+            proc.BeginErrorReadLine();
             proc.WaitForExit();// Waits here for the process to exit.
 
             int exitCode = proc.ExitCode;
-            string exitOutput = string.Empty;
-            using (StreamReader sr = proc.StandardOutput)
-            {
-                exitOutput = sr.ReadToEnd();
-            }
 
-            string exitError = string.Empty;
-            using (StreamReader sr = proc.StandardError)
-            {
-                exitError = sr.ReadToEnd();
-            }
+            proc.CancelOutputRead();
+            proc.CancelErrorRead();
+            proc.Dispose();           
 
             if (fi.Exists)
                 fi.Delete();
 
-            return new DockerBuildResult(exitCode, exitOutput, exitError);
+            return new DockerBuildResult(exitCode, outputData, errorData);
         }
 
         private static readonly StringBuilder sb = new StringBuilder();
