@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "dockerumble": {
+      "commandName": "Project",
+      "commandLineArgs": "build -di=am1goo/netcore31 -c=netcore31 -r=https://github.com/bernardbr/hello-world-netcore -p=\"--runtime linux-x64 --configuration Release\""
+    }
+  }
+}
