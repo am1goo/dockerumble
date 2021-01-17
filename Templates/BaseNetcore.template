@@ -1,8 +1,0 @@
-﻿FROM $FROM$
-$LABELS$
-
-RUN apt-get update && apt-get install -y git
-ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
-
-RUN mkdir app && cd app && git clone $REPO_URL$ && cd /app/$REPO_NAME$ && git reset --hard $REPO_COMMIT$
-RUN cd /app/$REPO_NAME$ && dotnet build $PASS_ARGS$ --output /app/$REPO_NAME$.output
